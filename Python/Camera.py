@@ -2,6 +2,7 @@
 import tkinter as tk
 import os
 import time
+import subprocess
 
 
 class Camera:
@@ -464,6 +465,14 @@ class Camera:
         self.cam.wait_recording(float(dur))
         self.cam.stop_recording()
         print("done.")
+
+        # conversion to ImageJ compatible .avi using the mjpeg condec of ffmpeg
+        # available through libav-tools
+        fname = videoPath + 'video_' + time.strftime('%Y-%m-%d-%H-%M-%S') + '.h264'
+        outname = os.path.splitext(fname)[0]+'.avi'
+        command = ['avconv','-i',fname,'-b:v','2M','-codec','mjpeg',outname]
+        subprocess.call(command,shell=False)
+        
         #here we restore the preview resolution if it was the maximal one.
         if self.resVal == "2592x1944":
             self.cam.resolution = (2592, 1944)
